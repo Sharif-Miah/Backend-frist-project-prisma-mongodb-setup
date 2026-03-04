@@ -2,6 +2,8 @@ const prisma = require("../lib/prisma");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// Register api
+
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -26,6 +28,9 @@ exports.register = async (req, res) => {
       .json({ message: "Something went wrong", error: error.message });
   }
 };
+
+// Login api
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -48,5 +53,34 @@ exports.login = async (req, res) => {
     res.json({ token });
   } catch (error) {
     res.status(500).json({ message: "login failed" });
+  }
+};
+
+// Profile Api
+
+exports.profile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error("Profile Error:", error);
+    res
+      .status(500)
+      .json({ message: "Something went wrong", error: error.message });
   }
 };
