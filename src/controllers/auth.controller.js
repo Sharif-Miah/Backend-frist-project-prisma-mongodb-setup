@@ -56,6 +56,31 @@ exports.login = async (req, res) => {
   }
 };
 
+// GET ALL USERS
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    console.log(users);
+
+    res.json({ users });
+  } catch (error) {
+    console.error("Get Users Error:", error);
+    res.status(500).json({
+      message: "Failed to fetch users",
+      error: error.message,
+    });
+  }
+};
+
 // Profile Api
 
 exports.profile = async (req, res) => {
