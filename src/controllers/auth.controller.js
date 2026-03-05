@@ -1,6 +1,7 @@
 const prisma = require("../lib/prisma");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 // Register api
 
@@ -53,6 +54,74 @@ exports.login = async (req, res) => {
     res.json({ token });
   } catch (error) {
     res.status(500).json({ message: "login failed" });
+  }
+};
+
+// generate a reset token
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
+
+    await prisma.user.update({
+      where: { email },
+      data: {
+        resetToken,
+        resetTokenExpiry,
+      },
+    });
+
+    res.json({
+      message: "Passoerd reset token genarated",
+      resetToken,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to generate reset token" });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    const user = await prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpiry: {
+          gt: new Date(),
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "invalid or expired token" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    });
+
+    res.json({ message: "Password reset successfull" });
+  } catch (error) {
+    res.status(500).json({ message: "Password reset failed" });
   }
 };
 
