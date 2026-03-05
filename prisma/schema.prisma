@@ -14,6 +14,6 @@ model User {
   password String
   createdAt DateTime @default(now())
 
-  resetToken       String?
-  resetTokenExpiry DateTime?
+  resetOtp       String?
+  resetOtpExpiry DateTime?
 }

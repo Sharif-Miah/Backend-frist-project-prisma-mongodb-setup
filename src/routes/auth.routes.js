@@ -7,12 +7,13 @@ const authMiddleware = require("../middleware/auth.middleware");
 router.post("/register", authController.register);
 router.post("/login", authController.login);
 
-router.post("/forgot-password", authController.forgotPassword);
+router.post("/send-reset-otp", authController.sendResetOtp);
+router.post("/verify-reset-otp", authController.verifyResetOtp);
 router.post("/reset-password", authController.resetPassword);
 
 router.get("/profile", authMiddleware, authController.profile);
 router.put("/profile", authMiddleware, authController.updateProfile);
 router.delete("/profile", authMiddleware, authController.deleteAccoutn);
-router.get("/users", authMiddleware, authController.getAllUsers);
+router.get("/users", authController.getAllUsers);
 
 module.exports = router;
