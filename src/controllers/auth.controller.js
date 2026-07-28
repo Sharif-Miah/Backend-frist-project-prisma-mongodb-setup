@@ -45,14 +45,40 @@ exports.register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const verifyOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const verifyOtpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
     const newUser = await prisma.user.create({
-      data: { name, email, password: hashedPassword },
+      data: { name, email, password: hashedPassword, verifyOtp, verifyOtpExpiry },
       select: { id: true, name: true, email: true, createdAt: true },
     });
 
+    const htmlTemplate = `
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+  <div style="max-width: 450px; margin: auto; background: #ffffff; padding: 40px; border-radius: 16px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+    <div style="margin-bottom: 20px;">
+      <div style="display: inline-block; width: 60px; height: 60px; background: #eef2ff; border-radius: 50%; line-height: 60px;">
+        <span style="font-size: 30px;">✉️</span>
+      </div>
+    </div>
+    <h2 style="color: #1a1c1e; margin-bottom: 10px; font-weight: 700;">Verify Your Email</h2>
+    <p style="color: #64748b; font-size: 15px; line-height: 1.5; margin-bottom: 30px;">
+      To complete your registration, please enter the 6-digit verification code provided below.
+    </p>
+    <div style="font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: 800; letter-spacing: 10px; color: #4f46e5; background: #f8fafc; border: 2px dashed #e2e8f0; padding: 20px; margin: 20px 0; border-radius: 12px;">
+      ${verifyOtp}
+    </div>
+    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 30px;">
+      This code is valid for <strong style="color: #475569;">10 minutes</strong>.
+    </p>
+  </div>
+</div>
+`;
+
+    await sendEmail(email, "Verify Your Email", htmlTemplate);
+
     res.status(201).json({
-      message: "User registered successfully",
+      message: "User registered successfully. Please check your email to verify your account.",
       user: newUser,
     });
   } catch (error) {
@@ -60,6 +86,38 @@ exports.register = async (req, res) => {
     res
       .status(500)
       .json({ message: "Failed to register user", error: error.message });
+  }
+};
+
+// Verify Email API
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user || user.verifyOtp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (user.verifyOtpExpiry < new Date()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    await prisma.user.update({
+      where: { email },
+      data: {
+        isVerified: true,
+        verifyOtp: null,
+        verifyOtpExpiry: null,
+      },
+    });
+
+    res.json({ message: "Email verified successfully. You can now login." });
+  } catch (error) {
+    res.status(500).json({ message: "Email verification failed" });
   }
 };
 
@@ -74,6 +132,10 @@ exports.login = async (req, res) => {
     });
 
     if (!user) return res.status(400).json({ message: "User not found" });
+
+    if (!user.isVerified) {
+      return res.status(403).json({ message: "Please verify your email first before logging in." });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
