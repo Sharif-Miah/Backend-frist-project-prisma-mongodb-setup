@@ -21,3 +21,18 @@ model User {
   verifyOtp       String?
   verifyOtpExpiry DateTime?
 }
+
+model Flight {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  airline          String
+  flightNumber     String
+  departureTime    String
+  arrivalTime      String
+  departureAirport String
+  arrivalAirport   String
+  duration         String
+  isDirect         Boolean  @default(true)
+  price            Float
+  amenities        String[]
+  createdAt        DateTime @default(now())
+}
