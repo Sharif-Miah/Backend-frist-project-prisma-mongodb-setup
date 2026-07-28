@@ -15,7 +15,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Backend running");
+  res.send("Backend is running");
 });
 
 app.get("/api/profile", authMiddleware, (req, res) => {
