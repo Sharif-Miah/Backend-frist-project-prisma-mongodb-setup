@@ -7,7 +7,7 @@ const addDestination = async (req, res) => {
     const { title, location, packages, price, imageUrl } = req.body;
 
     if (!title || !location || !packages || !price || !imageUrl) {
-      return res.status(400).json({ error: "All fields are required" });
+      return res.status(400).json({ error: "Title, location, packages, price, and imageUrl are required" });
     }
 
     const destination = await prisma.destination.create({
@@ -44,6 +44,26 @@ const getDestinations = async (req, res) => {
   }
 };
 
+// Get a single destination by ID
+const getDestinationById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const destination = await prisma.destination.findUnique({
+      where: { id },
+    });
+
+    if (!destination) {
+      return res.status(404).json({ error: "Destination not found" });
+    }
+
+    res.status(200).json(destination);
+  } catch (error) {
+    console.error("Error fetching destination:", error);
+    res.status(500).json({ error: "Failed to fetch destination" });
+  }
+};
+
 // Update a destination (Patch)
 const updateDestination = async (req, res) => {
   try {
@@ -59,7 +79,6 @@ const updateDestination = async (req, res) => {
       return res.status(404).json({ error: "Destination not found" });
     }
 
-    // Build update data only with provided fields
     const updateData = {};
     if (title) updateData.title = title;
     if (location) updateData.location = location;
@@ -112,6 +131,7 @@ const deleteDestination = async (req, res) => {
 module.exports = {
   addDestination,
   getDestinations,
+  getDestinationById,
   updateDestination,
   deleteDestination,
 };

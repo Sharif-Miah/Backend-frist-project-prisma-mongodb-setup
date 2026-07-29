@@ -17,6 +17,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/flights", flightRoutes);
 app.use("/api/destinations", destinationRoutes);
 
+
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });

@@ -34,16 +34,26 @@ model Flight {
   isDirect         Boolean  @default(true)
   price            Float
   amenities        String[]
+  
+  // Detailed Information
+  coverImage          String?
+  cabinClass          String?
+  baggageAllowance    String?
+  refundPolicy        String?
+  dateChangePolicy    String?
+  mealAvailability    String?
+  includedInFare      String[]
+  
   createdAt        DateTime @default(now())
 }
 
 model Destination {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  title         String
-  location      String
-  packages      Int
-  price         Float
-  imageUrl      String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  title               String
+  location            String
+  packages            Int
+  price               Float
+  imageUrl            String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
