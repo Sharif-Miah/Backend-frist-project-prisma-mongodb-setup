@@ -36,3 +36,14 @@ model Flight {
   amenities        String[]
   createdAt        DateTime @default(now())
 }
+
+model Destination {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  location      String
+  packages      Int
+  price         Float
+  imageUrl      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
