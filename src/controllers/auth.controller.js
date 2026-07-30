@@ -337,6 +337,7 @@ exports.getAllUsers = async (req, res) => {
         id: true,
         name: true,
         email: true,
+        travelers: true,
         createdAt: true,
       },
     });
@@ -365,6 +366,7 @@ exports.profile = async (req, res) => {
         id: true,
         name: true,
         email: true,
+        travelers: true,
         createdAt: true,
       },
     });
@@ -407,6 +409,7 @@ exports.updateProfile = async (req, res) => {
         id: true,
         name: true,
         email: true,
+        travelers: true,
         createdAt: true,
       },
     });
@@ -419,6 +422,43 @@ exports.updateProfile = async (req, res) => {
     console.error("Update Profile Error:", error);
     res.status(500).json({
       message: "Failed to update profile",
+      error: error.message,
+    });
+  }
+};
+
+// Update Travelers
+exports.updateTravelers = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { travelers } = req.body;
+
+    if (!Array.isArray(travelers)) {
+      return res.status(400).json({ message: "travelers must be an array" });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        travelers: travelers
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        travelers: true,
+        createdAt: true,
+      },
+    });
+
+    res.json({
+      message: "Traveler information updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update Travelers Error:", error);
+    res.status(500).json({
+      message: "Failed to update traveler information",
       error: error.message,
     });
   }

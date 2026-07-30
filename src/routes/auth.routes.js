@@ -15,6 +15,7 @@ router.post("/reset-password", authController.resetPassword);
 
 router.get("/profile", authMiddleware, authController.profile);
 router.put("/profile", authMiddleware, authController.updateProfile);
+router.put("/travelers", authMiddleware, authController.updateTravelers);
 router.delete("/profile", authMiddleware, authController.deleteAccoutn);
 router.get("/users", authController.getAllUsers);
 

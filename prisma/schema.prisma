@@ -20,6 +20,20 @@ model User {
   isVerified      Boolean   @default(false)
   verifyOtp       String?
   verifyOtpExpiry DateTime?
+
+  travelers       Traveler[]
+}
+
+type Traveler {
+  travelerType       String?
+  fullName           String
+  dateOfBirth        String
+  gender             String
+  emailAddress       String?
+  phoneNumber        String?
+  passportNumber     String?
+  passportExpiryDate String?
+  country            String?
 }
 
 model Flight {
