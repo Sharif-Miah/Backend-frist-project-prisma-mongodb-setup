@@ -7,6 +7,7 @@ const authMiddleware = require("./middleware/auth.middleware");
 const authRoutes = require("./routes/auth.routes");
 const flightRoutes = require("./routes/flight.routes");
 const destinationRoutes = require("./routes/destination.routes");
+const hotelRoutes = require("./routes/hotel.routes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/flights", flightRoutes);
 app.use("/api/destinations", destinationRoutes);
+app.use("/api/hotels", hotelRoutes);
 
 
 app.get("/", (req, res) => {
