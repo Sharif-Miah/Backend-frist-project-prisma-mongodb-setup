@@ -342,7 +342,7 @@ exports.getAllUsers = async (req, res) => {
       },
     });
 
-    console.log(users);
+    // console.log(users);
 
     res.json({ users });
   } catch (error) {
