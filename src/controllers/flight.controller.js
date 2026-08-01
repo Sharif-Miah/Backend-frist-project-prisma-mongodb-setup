@@ -60,7 +60,7 @@ exports.addFlight = async (req, res) => {
 // Get all flights with filtering
 exports.getFlights = async (req, res) => {
   try {
-    const { departureAirport, arrivalAirport, airline } = req.query;
+    const { departureAirport, arrivalAirport, airline, stops } = req.query;
 
     // Build the query object based on provided filters
     const query = {};
@@ -79,11 +79,49 @@ exports.getFlights = async (req, res) => {
       };
     }
 
+    // Filter by multiple airlines (e.g., Emirates,Qatar Airways)
     if (airline) {
-      query.airline = {
-        contains: airline,
-        mode: "insensitive",
-      };
+      let airlineArray = [];
+      if (Array.isArray(airline)) {
+        airlineArray = airline;
+      } else if (typeof airline === "string") {
+        airlineArray = airline.split(",").map((a) => a.trim());
+      }
+
+      if (airlineArray.length === 1) {
+        query.airline = {
+          contains: airlineArray[0],
+          mode: "insensitive",
+        };
+      } else if (airlineArray.length > 1) {
+        query.airline = {
+          in: airlineArray,
+        };
+      }
+    }
+
+    // Filter by stops (e.g., Direct, 1 Stop, 2+ Stops)
+    if (stops) {
+      let stopsArray = [];
+      if (Array.isArray(stops)) {
+        stopsArray = stops.map(s => s.toLowerCase());
+      } else if (typeof stops === "string") {
+        stopsArray = stops.split(",").map((s) => s.trim().toLowerCase());
+      }
+
+      let isDirectConditions = [];
+      if (stopsArray.includes("direct")) {
+        isDirectConditions.push(true);
+      }
+      if (stopsArray.includes("1 stop") || stopsArray.includes("2+ stops")) {
+        isDirectConditions.push(false);
+      }
+
+      // If only true or only false is selected, apply the filter
+      if (isDirectConditions.length === 1) {
+        query.isDirect = isDirectConditions[0];
+      }
+      // If both are selected (e.g., Direct and 1 Stop), it fetches all (no filter needed)
     }
 
     const flights = await prisma.flight.findMany({
