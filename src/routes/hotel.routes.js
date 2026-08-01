@@ -5,6 +5,7 @@ const hotelController = require("../controllers/hotel.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 
 router.post("/", authMiddleware, hotelController.createHotel);
+router.post("/guest-info", authMiddleware, hotelController.addGuestInfo);
 router.get("/", hotelController.getAllHotels);
 router.get("/:id", hotelController.getHotelById);
 router.put("/:id", authMiddleware, hotelController.updateHotel);

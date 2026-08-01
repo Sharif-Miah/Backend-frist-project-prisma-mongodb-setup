@@ -24,8 +24,18 @@ app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
-app.get("/api/profile", authMiddleware, (req, res) => {
-  res.json({ message: "Protected route", user: req.user });
+const prisma = require("./lib/prisma");
+
+app.get("/api/profile", authMiddleware, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { id: true, name: true, email: true, guestInfo: true, travelers: true }
+    });
+    res.json({ message: "User profile", user });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user profile", error: error.message });
+  }
 });
 
 const PORT = process.env.PORT || 5000;

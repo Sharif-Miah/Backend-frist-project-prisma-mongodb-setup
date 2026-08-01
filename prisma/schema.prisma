@@ -22,6 +22,7 @@ model User {
   verifyOtpExpiry DateTime?
 
   travelers       Traveler[]
+  guestInfo       GuestInfo[]
 }
 
 type Traveler {
@@ -34,6 +35,14 @@ type Traveler {
   passportNumber     String?
   passportExpiryDate String?
   country            String?
+}
+
+type GuestInfo {
+  fullName        String
+  emailAddress    String
+  phoneNumber     String
+  country         String
+  specialRequests String?
 }
 
 model Flight {

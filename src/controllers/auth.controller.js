@@ -338,6 +338,7 @@ exports.getAllUsers = async (req, res) => {
         name: true,
         email: true,
         travelers: true,
+        guestInfo: true,
         createdAt: true,
       },
     });
