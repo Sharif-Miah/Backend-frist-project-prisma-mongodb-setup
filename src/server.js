@@ -8,6 +8,7 @@ const authRoutes = require("./routes/auth.routes");
 const flightRoutes = require("./routes/flight.routes");
 const destinationRoutes = require("./routes/destination.routes");
 const hotelRoutes = require("./routes/hotel.routes");
+const tourRoutes = require("./routes/tour.routes");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/flights", flightRoutes);
 app.use("/api/destinations", destinationRoutes);
 app.use("/api/hotels", hotelRoutes);
+app.use("/api/tours", tourRoutes);
 
 
 app.get("/", (req, res) => {
@@ -30,7 +32,7 @@ app.get("/api/profile", authMiddleware, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
-      select: { id: true, name: true, email: true, guestInfo: true, travelers: true }
+      select: { id: true, name: true, email: true, guestInfo: true, flightTravelers: true, tourTravellers: true }
     });
     res.json({ message: "User profile", user });
   } catch (error) {

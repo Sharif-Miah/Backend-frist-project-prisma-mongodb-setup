@@ -337,7 +337,8 @@ exports.getAllUsers = async (req, res) => {
         id: true,
         name: true,
         email: true,
-        travelers: true,
+        flightTravelers: true,
+        tourTravellers: true,
         guestInfo: true,
         createdAt: true,
       },
@@ -367,7 +368,8 @@ exports.profile = async (req, res) => {
         id: true,
         name: true,
         email: true,
-        travelers: true,
+        flightTravelers: true,
+        tourTravellers: true,
         createdAt: true,
       },
     });
@@ -410,7 +412,8 @@ exports.updateProfile = async (req, res) => {
         id: true,
         name: true,
         email: true,
-        travelers: true,
+        flightTravelers: true,
+        tourTravellers: true,
         createdAt: true,
       },
     });
@@ -428,26 +431,27 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// Update Travelers
-exports.updateTravelers = async (req, res) => {
+// Update Flight Travelers
+exports.updateFlightTravelers = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { travelers } = req.body;
+    const { flightTravelers } = req.body;
 
-    if (!Array.isArray(travelers)) {
-      return res.status(400).json({ message: "travelers must be an array" });
+    if (!Array.isArray(flightTravelers)) {
+      return res.status(400).json({ message: "flightTravelers must be an array" });
     }
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        travelers: travelers
+        flightTravelers: flightTravelers
       },
       select: {
         id: true,
         name: true,
         email: true,
-        travelers: true,
+        flightTravelers: true,
+        tourTravellers: true,
         createdAt: true,
       },
     });
@@ -460,6 +464,43 @@ exports.updateTravelers = async (req, res) => {
     console.error("Update Travelers Error:", error);
     res.status(500).json({
       message: "Failed to update traveler information",
+      error: error.message,
+    });
+  }
+};
+
+// Update Tour Travelers
+exports.updateTourTravellers = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { tourTravellers } = req.body;
+
+    if (!Array.isArray(tourTravellers)) {
+      return res.status(400).json({ message: "tourTravellers must be an array" });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        tourTravellers: tourTravellers
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        tourTravellers: true,
+        createdAt: true,
+      },
+    });
+
+    res.json({
+      message: "Tour Traveler information updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update Tour Travelers Error:", error);
+    res.status(500).json({
+      message: "Failed to update tour traveler information",
       error: error.message,
     });
   }
