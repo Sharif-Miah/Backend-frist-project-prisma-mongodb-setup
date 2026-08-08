@@ -126,7 +126,7 @@ exports.getHotelById = async (req, res) => {
 exports.getAllHotels = async (req, res) => {
   try {
     const { destination, location, starRating, propertyType, amenities, pricePerNight } = req.query;
-    
+
     // Build the where clause for Prisma
     const query = {};
 
@@ -196,36 +196,46 @@ exports.addGuestInfo = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const currentGuestInfo = user.guestInfo || [];
-    const newGuest = {
-      fullName,
-      emailAddress,
-      phoneNumber,
-      country,
-      specialRequests: specialRequests || null,
-    };
-
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
+    const newGuest = await prisma.guestInfo.create({
       data: {
-        guestInfo: [...currentGuestInfo, newGuest],
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        guestInfo: true,
+        fullName,
+        emailAddress,
+        phoneNumber,
+        country,
+        specialRequests: specialRequests || null,
+        userId: userId,
       },
     });
 
     res.status(200).json({
       message: "Guest information added successfully",
-      guestInfo: updatedUser.guestInfo,
+      guestInfo: newGuest,
     });
   } catch (error) {
     console.error("Add Guest Info Error:", error);
     res.status(500).json({
       message: "Failed to add guest information",
+      error: error.message,
+    });
+  }
+};
+
+// Get Guest Information for Logged-in User
+exports.getGuestInfo = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const guestInfo = await prisma.guestInfo.findMany({
+      where: { userId },
+    });
+
+    res.status(200).json({
+      guestInfo,
+    });
+  } catch (error) {
+    console.error("Get Guest Info Error:", error);
+    res.status(500).json({
+      message: "Failed to fetch guest information",
       error: error.message,
     });
   }

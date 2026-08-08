@@ -21,12 +21,15 @@ model User {
   verifyOtp       String?
   verifyOtpExpiry DateTime?
 
-  flightTravelers       Traveler[]
+  flightTravelers FlightTraveler[]
   guestInfo       GuestInfo[]
-  tourTravellers  TourTravellerInfo[]
+  tourTravellers  TourTraveller[]
 }
 
-type Traveler {
+model FlightTraveler {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String   @db.ObjectId
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   travelerType       String?
   fullName           String
   dateOfBirth        String
@@ -38,7 +41,10 @@ type Traveler {
   country            String?
 }
 
-type GuestInfo {
+model GuestInfo {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   fullName        String
   emailAddress    String
   phoneNumber     String
@@ -136,7 +142,10 @@ type TourItinerary {
   description String
 }
 
-type TourTravellerInfo {
+model TourTraveller {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   fullName        String
   emailAddress    String
   phoneNumber     String

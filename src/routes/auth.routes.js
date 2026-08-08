@@ -15,8 +15,10 @@ router.post("/reset-password", authController.resetPassword);
 
 router.get("/profile", authMiddleware, authController.profile);
 router.put("/profile", authMiddleware, authController.updateProfile);
-router.put("/flightTravelers", authMiddleware, authController.updateFlightTravelers);
-router.put("/tourTravellers", authMiddleware, authController.updateTourTravellers);
+router.post("/flightTravelers", authMiddleware, authController.addFlightTravelers);
+router.get("/flightTravelers", authMiddleware, authController.getFlightTravelers);
+router.post("/tourTravellers", authMiddleware, authController.addTourTravellers);
+router.get("/tourTravellers", authMiddleware, authController.getTourTravellers);
 router.delete("/profile", authMiddleware, authController.deleteAccoutn);
 router.get("/users", authController.getAllUsers);
 

@@ -431,8 +431,8 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// Update Flight Travelers
-exports.updateFlightTravelers = async (req, res) => {
+// Add Flight Travelers
+exports.addFlightTravelers = async (req, res) => {
   try {
     const userId = req.user.id;
     const { flightTravelers } = req.body;
@@ -441,36 +441,51 @@ exports.updateFlightTravelers = async (req, res) => {
       return res.status(400).json({ message: "flightTravelers must be an array" });
     }
 
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        flightTravelers: flightTravelers
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        flightTravelers: true,
-        tourTravellers: true,
-        createdAt: true,
-      },
+    const travelersData = flightTravelers.map((traveler) => ({
+      ...traveler,
+      userId,
+    }));
+
+    const newTravelers = await prisma.flightTraveler.createMany({
+      data: travelersData,
     });
 
-    res.json({
-      message: "Traveler information updated successfully",
-      user: updatedUser,
+    res.status(201).json({
+      message: "Traveler information added successfully",
+      count: newTravelers.count,
     });
   } catch (error) {
-    console.error("Update Travelers Error:", error);
+    console.error("Add Travelers Error:", error);
     res.status(500).json({
-      message: "Failed to update traveler information",
+      message: "Failed to add traveler information",
       error: error.message,
     });
   }
 };
 
-// Update Tour Travelers
-exports.updateTourTravellers = async (req, res) => {
+// Get Flight Travelers
+exports.getFlightTravelers = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const travelers = await prisma.flightTraveler.findMany({
+      where: { userId },
+    });
+
+    res.status(200).json({
+      flightTravelers: travelers,
+    });
+  } catch (error) {
+    console.error("Get Flight Travelers Error:", error);
+    res.status(500).json({
+      message: "Failed to fetch flight travelers",
+      error: error.message,
+    });
+  }
+};
+
+// Add Tour Travelers
+exports.addTourTravellers = async (req, res) => {
   try {
     const userId = req.user.id;
     const { tourTravellers } = req.body;
@@ -479,28 +494,44 @@ exports.updateTourTravellers = async (req, res) => {
       return res.status(400).json({ message: "tourTravellers must be an array" });
     }
 
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        tourTravellers: tourTravellers
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        tourTravellers: true,
-        createdAt: true,
-      },
+    const travellersData = tourTravellers.map((traveller) => ({
+      ...traveller,
+      userId,
+    }));
+
+    const newTravellers = await prisma.tourTraveller.createMany({
+      data: travellersData,
     });
 
-    res.json({
-      message: "Tour Traveler information updated successfully",
-      user: updatedUser,
+    res.status(201).json({
+      message: "Tour Traveler information added successfully",
+      count: newTravellers.count,
     });
   } catch (error) {
-    console.error("Update Tour Travelers Error:", error);
+    console.error("Add Tour Travelers Error:", error);
     res.status(500).json({
-      message: "Failed to update tour traveler information",
+      message: "Failed to add tour traveler information",
+      error: error.message,
+    });
+  }
+};
+
+// Get Tour Travelers
+exports.getTourTravellers = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const travellers = await prisma.tourTraveller.findMany({
+      where: { userId },
+    });
+
+    res.status(200).json({
+      tourTravellers: travellers,
+    });
+  } catch (error) {
+    console.error("Get Tour Travelers Error:", error);
+    res.status(500).json({
+      message: "Failed to fetch tour travelers",
       error: error.message,
     });
   }
