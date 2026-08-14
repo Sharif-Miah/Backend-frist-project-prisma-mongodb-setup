@@ -79,6 +79,7 @@ exports.updateHotel = async (req, res) => {
 };
 
 // Delete Hotel
+
 exports.deleteHotel = async (req, res) => {
   try {
     const { id } = req.params;

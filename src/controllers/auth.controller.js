@@ -6,31 +6,6 @@ const sendEmail = require("../utils/sendEmail");
 
 // Register api
 
-// exports.register = async (req, res) => {
-//   try {
-//     const { name, email, password } = req.body;
-
-//     console.log("Register bosy", req.body);
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     const user = await prisma.user.create({
-//       data: {
-//         name,
-//         email,
-//         password: hashedPassword,
-//       },
-//     });
-
-//     res.status(201).json(user);
-//   } catch (error) {
-//     console.error("Register Error:", error); // <-- Add this
-//     res
-//       .status(500)
-//       .json({ message: "Something went wrong", error: error.message });
-//   }
-// };
-
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -193,7 +168,7 @@ exports.refreshToken = async (req, res) => {
   }
 };
 
-// Generates OPT and saves it
+// Generates OTP and saves it
 
 exports.sendResetOtp = async (req, res) => {
   try {
